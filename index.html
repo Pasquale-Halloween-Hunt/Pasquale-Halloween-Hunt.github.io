@@ -1,14 +1,64 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#101021"><title>The Halloween Hunt</title>
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="house.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101021">
+  <title>The Halloween Hunt</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/house.css">
 </head>
 <body>
-<div class="stars" aria-hidden="true"></div>
-<header class="topbar"><a href="./" id="home-link" class="brand">☾ <span>THE HALLOWEEN HUNT</span></a><div class="progress-label" id="progress-label">0 / 12 charms</div></header>
-<main id="app" class="shell" aria-live="polite"></main>
-<footer class="footer">A little magic, a little mischief, and twelve mysterious charms. <span>✦</span></footer>
-<script src="app.js" defer></script>
-</body></html>
+  <div class="stars" aria-hidden="true"></div>
+  <header class="topbar">
+    <a href="./" id="home-link" class="brand">☾ <span>THE HALLOWEEN HUNT</span></a>
+    <div class="topbar-status">
+      <button class="difficulty-button" id="difficulty-button" type="button">
+        Difficulty: Choose
+      </button>
+      <div class="progress-label" id="progress-label">0 / 12 charms</div>
+    </div>
+  </header>
+  <main id="app" class="shell" aria-live="polite"></main>
+  <dialog class="difficulty-dialog" id="difficulty-dialog" aria-labelledby="difficulty-title">
+    <button
+      class="dialog-close"
+      id="difficulty-close"
+      type="button"
+      aria-label="Close difficulty selection"
+    >
+      ×
+    </button>
+    <div class="eyebrow">Choose your path</div>
+    <h2 id="difficulty-title">Select a difficulty</h2>
+    <p class="muted">You can change this later beside the charm counter.</p>
+    <div class="difficulty-options">
+      <button class="difficulty-option" data-difficulty="normal" type="button">
+        <strong>Normal</strong>
+        <span>A relaxed hunt for the full party.</span>
+      </button>
+      <button class="difficulty-option" data-difficulty="challenging" type="button">
+        <strong>Challenging</strong>
+        <span>A trickier path for experienced hunters.</span>
+      </button>
+      <button class="difficulty-option" data-difficulty="nightmare" type="button">
+        <strong>Nightmare</strong>
+        <span>The most sinister version of the hunt.</span>
+      </button>
+    </div>
+  </dialog>
+  <footer class="footer">
+    The Pasquale Halloween Hunt - Pig Roast 2026<br>Created by Jason Wang
+  </footer>
+  <script src="js/app.js" type="module"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(error => {
+          console.warn('Offline mode could not be enabled:', error);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

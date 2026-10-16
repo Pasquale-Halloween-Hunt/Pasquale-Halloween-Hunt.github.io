@@ -1,0 +1,429 @@
+.scene {
+  position:relative;
+  aspect-ratio:16/10;
+  overflow:hidden;
+  border:3px solid #675070;
+  border-radius:16px;
+  background:linear-gradient(#12152f 0%,#2c2846 65%,#1d2431 100%);
+  isolation:isolate;
+  box-shadow:0 16px 45px #0009
+}
+
+.moon {
+  position:absolute;
+  left:12%;
+  top:10%;
+  width:13%;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:#f2e4b0;
+  box-shadow:0 0 32px #e6d9a660
+}
+
+.star {
+  position:absolute;
+  width:2px;
+  height:2px;
+  background:#eee3c7;
+  border-radius:50%
+}
+
+.scene-star-1 {
+  left:30%;
+  top:8%
+}
+
+.scene-star-2 {
+  left:68%;
+  top:12%
+}
+
+.scene-star-3 {
+  left:87%;
+  top:20%
+}
+
+.scene-star-4 {
+  left:43%;
+  top:15%
+}
+
+.hill {
+  position:absolute;
+  bottom:-16%;
+  width:70%;
+  height:36%;
+  border-radius:50%;
+  background:#131d22
+}
+
+.hill.left {
+  left:-20%
+}
+
+.hill.right {
+  right:-20%;
+  bottom:-20%
+}
+
+.house {
+  position:absolute;
+  left:4%;
+  top:6%;
+  width:92%;
+  height:90%;
+  z-index:1;
+  filter:drop-shadow(5px 8px 4px #05050c99)
+}
+
+.body {
+  position:absolute;
+  inset:24% 5% 0;
+  background:#333044;
+  border:5px solid #151321;
+  border-bottom:0
+}
+
+.roof {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:39%;
+  background:#1c1b2d;
+  clip-path:polygon(50% 0,100% 80%,95% 100%,5% 100%,0 80%)
+}
+
+.roof:after {
+  content:"";
+  position:absolute;
+  inset:12% 10% 8%;
+  background:#464056;
+  clip-path:polygon(50% 0,100% 83%,0 83%)
+}
+
+.chimney {
+  position:absolute;
+  right:17%;
+  top:0;
+  width:11%;
+  height:27%;
+  background:#282433;
+  border:4px solid #161420
+}
+
+.door {
+  position:absolute;
+  bottom:0;
+  left:40%;
+  height:38%;
+  width:20%;
+  border:4px solid #17131d;
+  border-radius:45% 45% 0 0;
+  background:#171625
+}
+
+.door:after {
+  content:"";
+  position:absolute;
+  right:16%;
+  top:56%;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#d4ae62
+}
+
+.window {
+  position:absolute;
+  width:22%;
+  height:24%;
+  border:5px solid #17141e;
+  background:#927b51;
+  box-shadow:inset 0 0 16px #e5a95b80,0 0 7px #c78e5044;
+  overflow:hidden
+}
+
+.window:before,.window:after {
+  content:"";
+  position:absolute;
+  background:#211927;
+  z-index:3
+}
+
+.window:before {
+  left:47%;
+  top:0;
+  width:5px;
+  height:100%
+}
+
+.window:after {
+  top:48%;
+  left:0;
+  width:100%;
+  height:5px
+}
+
+.w1 {
+  top:32%;
+  left:9%
+}
+
+.w2 {
+  top:32%;
+  left:39%
+}
+
+.w3 {
+  top:32%;
+  right:9%
+}
+
+.w4 {
+  top:61%;
+  left:9%
+}
+
+.w5 {
+  top:61%;
+  right:9%
+}
+
+.w6 {
+  top:7%;
+  left:39%;
+  height:21%;
+  width:22%;
+  border-radius:48% 48% 0 0
+}
+
+.ghost {
+  position:absolute;
+  left:17%;
+  top:14%;
+  width:66%;
+  height:77%;
+  background:#f7f4e8;
+  border-radius:48% 48% 6% 6%;
+  filter:drop-shadow(0 0 5px #fff);
+  opacity:0;
+  transform:translateY(20%);
+  transition:opacity .09s,transform .13s;
+  z-index:1
+}
+
+.ghost:before,.ghost:after {
+  content:"";
+  position:absolute;
+  top:35%;
+  width:14%;
+  height:17%;
+  background:#242038;
+  border-radius:50%
+}
+
+.ghost:before {
+  left:25%
+}
+
+.ghost:after {
+  right:25%
+}
+
+.ghost.on {
+  opacity:1;
+  transform:translateY(0)
+}
+
+/* Two vampire cameos, separate from the fourteen countable ghosts. */
+.vampire {
+  position:absolute;
+  left:17%;
+  top:13%;
+  width:66%;
+  height:84%;
+  opacity:0;
+  transform:translateY(22%);
+  transition:opacity .12s,transform .16s;
+  z-index:2;
+  pointer-events:none
+}
+
+.vampire.on {
+  opacity:1;
+  transform:translateY(0)
+}
+
+.vampire .cape {
+  position:absolute;
+  inset:36% 0 0;
+  background:#56142e;
+  clip-path:polygon(50% 0,87% 10%,100% 100%,0 100%,13% 10%);
+  border-radius:20%
+}
+
+.vampire .face {
+  position:absolute;
+  left:19%;
+  top:12%;
+  width:62%;
+  height:59%;
+  background:#d9c5bc;
+  border-radius:43% 43% 48% 48%;
+  border:1px solid #57475b
+}
+
+.vampire .hair {
+  position:absolute;
+  left:16%;
+  top:0;
+  width:68%;
+  height:32%;
+  background:#17121e;
+  clip-path:polygon(0 0,100% 0,100% 88%,69% 62%,50% 100%,31% 62%,0 88%)
+}
+
+.vampire .eyes {
+  position:absolute;
+  left:33%;
+  top:39%;
+  width:9%;
+  height:8%;
+  background:#f04653;
+  border-radius:50%;
+  box-shadow:18px 0 #f04653
+}
+
+.vampire .fangs {
+  position:absolute;
+  left:39%;
+  top:59%;
+  width:24%;
+  height:12%;
+  background:#fff;
+  clip-path:polygon(0 0,100% 0,82% 100%,62% 0,38% 0,18% 100%)
+}
+
+.bat {
+  position:absolute;
+  top:23%;
+  left:-15%;
+  font:clamp(18px,5vw,40px) sans-serif;
+  color:#090a15;
+  z-index:8;
+  opacity:0;
+  white-space:nowrap;
+  pointer-events:none
+}
+
+.bat.fly-left {
+  animation:flyLeft 2.1s linear forwards
+}
+
+.bat.fly-right {
+  animation:flyRight 2.1s linear forwards;
+  transform:scaleX(-1)
+}
+
+@keyframes flyLeft {
+  0% {
+    left:-15%;
+    top:22%;
+    opacity:0
+  }
+
+  10% {
+    opacity:1
+  }
+
+  100% {
+    left:110%;
+    top:9%;
+    opacity:1
+  }
+}
+
+@keyframes flyRight {
+  0% {
+    left:110%;
+    top:9%;
+    opacity:0
+  }
+
+  10% {
+    opacity:1
+  }
+
+  100% {
+    left:-15%;
+    top:22%;
+    opacity:1
+  }
+}
+
+.lightning {
+  position:absolute;
+  inset:0;
+  background:#f7f3e0;
+  opacity:0;
+  pointer-events:none;
+  z-index:10
+}
+
+.fog {
+  position:absolute;
+  bottom:-8%;
+  left:-10%;
+  width:120%;
+  height:25%;
+  background:radial-gradient(ellipse,#b7b4d13b,transparent 65%);
+  z-index:9;
+  pointer-events:none
+}
+
+.ground {
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:11%;
+  background:#101b1c
+}
+
+.tree {
+  position:absolute;
+  bottom:8%;
+  width:10px;
+  height:46%;
+  background:#11131b;
+  transform:rotate(9deg);
+  z-index:0
+}
+
+.tree:before,.tree:after {
+  content:"";
+  position:absolute;
+  background:#11131b;
+  width:8px;
+  height:70%;
+  bottom:35%;
+  transform-origin:bottom
+}
+
+.tree:before {
+  transform:rotate(-45deg)
+}
+
+.tree:after {
+  transform:rotate(42deg)
+}
+
+.tree.left {
+  left:10%
+}
+
+.tree.right {
+  right:9%;
+  height:38%;
+  transform:rotate(-10deg)
+}

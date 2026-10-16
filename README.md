@@ -1,18 +1,37 @@
 # Halloween Hunt — website prototype
 
-Open `index.html` in a browser. It is a static, framework-free site with 12 challenges, local progress, a final anagram, and the CSS haunted house animation.
+It is a static, framework-free site with 12 challenges, local progress, a final anagram, and the CSS haunted house animation. Preview it through a local web server or deploy it to GitHub Pages; the reorganized JavaScript uses browser modules and should not be opened with a `file://` URL.
 
-For deployment, upload `index.html`, `style.css`, `house.css`, and `app.js` to a GitHub Pages repository. NFC tags and QR codes can use `https://YOUR-SITE/?tag=01` through `?tag=12`.
+For deployment, upload `index.html` together with the `css`, `js`, `challenges`, and `assets` directories to a GitHub Pages repository.
+
+The site installs an offline cache after the first successful page load. That first visit downloads the home page, styles, app code, and all 12 challenges, so scanned challenge links continue to work with weak or missing Wi-Fi afterward. Open the deployed site once on every device before the event and wait for that first load to finish. Service workers require HTTPS (GitHub Pages provides it) or `localhost`; they do not run from a `file://` URL.
+
+Each challenge has two URL forms:
+
+- NFC tags and QR codes use non-sequential token URLs such as `https://YOUR-SITE/?tag=pYX8yQ6OQdhQReHX`. Visiting a valid tag URL unlocks its mapped challenge in the current browser. The 12 tokens are stored in challenge order in `js/config.js`.
+- Normal challenge links use `https://YOUR-SITE/?challenge=01` through `?challenge=12`. These links only open after their matching tag has been found.
+- The organizer shortcut `https://YOUR-SITE/?tag=master` unlocks all 12 challenges in the current browser.
+
+Unlocks and completed challenges are stored in the browser's `localStorage`.
+
+On the first visit, players choose Normal, Challenging, or Nightmare difficulty. The selection is saved in `localStorage` and can be changed from the difficulty button beside the charm counter. Challenges can define different content and rules for each difficulty; the graveyard and potion challenges currently do so.
+
+## Project structure
+
+- `css/` contains shared site styles and the haunted-house scene styles.
+- `js/` contains the overarching app, navigation, progress, and challenge registry.
+- `challenges/` contains one JavaScript module per numbered challenge, plus a shared photo-challenge helper.
+- `assets/` is reserved for images, audio, video, fonts, and other static media.
 
 ## IMPORTANT: Photo submissions are in DEMO MODE
 
-Photo challenges #5 and #10 currently preview a selected image locally and allow **demo completion**, but **do not upload or store the photo**. For the actual event, deploy a photo backend and set `PHOTO_API_URL` near the top of `app.js`. The expected endpoint is `POST /upload` with multipart form fields `photo` (JPEG) and `challenge` (`5` or `10`). A real backend should enforce CORS for your GitHub Pages domain, content type/size checks, rate limits, safe public image delivery, and private organizer moderation. Do not use the demo completion mode at the event.
+Photo challenges #5 and #10 currently preview a selected image locally and allow **demo completion**, but **do not upload or store the photo**. For the actual event, deploy a photo backend and set `PHOTO_API_URL` near the top of `js/config.js`. The expected endpoint is `POST /upload` with multipart form fields `photo` (JPEG) and `challenge` (`5` or `10`). A real backend should enforce CORS for your GitHub Pages domain, content type/size checks, rate limits, safe public image delivery, and private organizer moderation. Do not use the demo completion mode at the event.
 
 The live photo slideshow and organizer moderation interface are **not implemented in this prototype**. They require the backend and should be added before the event.
 
 ## Other notes
 
-- Progress is stored in browser `localStorage` only. Clearing storage or switching devices loses progress.
+- Unlocks and progress are stored in browser `localStorage` only. Clearing storage or switching devices loses them.
 - The haunted house runs in the browser in this prototype. If desired, record it as MP4 and replace the scene with a video element for consistent playback on slower phones.
 - The constellation and potion are implemented as browser interactions. Test touch interactions and camera upload on actual iOS and Android devices before the event.
 - The final answer is `TRICK OR TREAT`.

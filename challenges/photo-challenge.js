@@ -24,6 +24,7 @@ export function renderPhotoChallenge(
   { number, ornament, instructions },
 ) {
   const photoKey = `photo-challenge-${number}`;
+  const uploadedKey = `photo-upload-key-${number}`;
   const savedPhoto = localStorage.getItem(photoKey);
   const status = PHOTO_API_URL
     ? 'Your photo will be uploaded to the event gallery.'
@@ -79,6 +80,8 @@ export function renderPhotoChallenge(
         const formData = new FormData();
         formData.append('photo', blob, 'photo.jpg');
         formData.append('challenge', String(number));
+        const previousUploadKey = localStorage.getItem(uploadedKey);
+        if (previousUploadKey) formData.append('previousKey', previousUploadKey);
 
         const response = await fetch(`${PHOTO_API_URL.replace(/\/$/, '')}/upload`, {
           method: 'POST',
@@ -86,6 +89,8 @@ export function renderPhotoChallenge(
         });
 
         if (!response.ok) throw Error(`Upload failed (${response.status})`);
+        const result = await response.json();
+        if (result.key) localStorage.setItem(uploadedKey, result.key);
         feedback('Photo uploaded successfully!', true);
       } else {
         feedback('Demo photo accepted locally. Real uploads require a backend.', true);

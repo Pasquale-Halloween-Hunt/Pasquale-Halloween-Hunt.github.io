@@ -270,7 +270,7 @@ function home() {
           <span class="symbol" aria-hidden="true">🔒</span>
           <strong>Mystery challenge</strong>
           <small>Challenge ${String(number).padStart(2, '0')}</small>
-          <span class="state">Locked — find the tag</span>
+          <span class="state">Locked - find the tag</span>
         </div>
       `;
     }

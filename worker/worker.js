@@ -120,18 +120,22 @@ async function upload(request, env, headers) {
   const replaceToken = crypto.randomUUID();
   const previousKey = String(form.get('previousKey') || '');
   const previousToken = String(form.get('previousToken') || '');
+  let replaced = false;
   await env.PHOTOS.put(key, file.stream(), {
     httpMetadata: { contentType: 'image/jpeg' },
     customMetadata: { replaceToken },
   });
-  if (validKey(previousKey) && previousKey.startsWith(`${folder}/`) && previousToken) {
+  if (validKey(previousKey) && previousKey.startsWith(`${folder}/`)) {
     const previous = await env.PHOTOS.head(previousKey);
-    if (previous?.customMetadata?.replaceToken === previousToken) {
+    const storedToken = previous?.customMetadata?.replaceToken;
+    // Legacy uploads have no token; the unguessable saved object key is their proof.
+    if (previous && (storedToken ? storedToken === previousToken : !previousToken)) {
       await env.PHOTOS.delete(previousKey);
       await env.PHOTOS.delete(`hidden/${previousKey}`);
+      replaced = true;
     }
   }
-  return json({ ok: true, key, replaceToken }, 201, headers);
+  return json({ ok: true, key, replaceToken, replaced }, 201, headers);
 }
 
 async function setSkipped(request, env, headers) {

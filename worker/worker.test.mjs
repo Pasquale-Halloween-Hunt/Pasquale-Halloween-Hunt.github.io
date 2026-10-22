@@ -114,6 +114,15 @@ test('replacement requires the original upload token', async () => {
   assert.equal(await env.PHOTOS.head(original.key), null);
 });
 
+test('replacement removes a legacy upload using its saved object key', async () => {
+  const env = { PHOTOS: bucket(), ADMIN_TOKEN: 'organizer-secret' };
+  const legacyKey = 'birds/1234567890123-00000000-0000-4000-8000-000000000000.jpg';
+  await env.PHOTOS.put(legacyKey, 'legacy photo');
+  const result = await upload(env, '5', { key: legacyKey });
+  assert.equal(result.replaced, true);
+  assert.equal(await env.PHOTOS.head(legacyKey), null);
+});
+
 test('organizer deletion removes the photo and skip marker', async () => {
   const env = { PHOTOS: bucket(), ADMIN_TOKEN: 'organizer-secret' };
   const photo = await upload(env);

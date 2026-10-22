@@ -85,9 +85,9 @@ export function renderPhotoChallenge(
         formData.append('challenge', String(number));
         const previousUploadKey = localStorage.getItem(uploadedKey);
         const previousToken = localStorage.getItem(uploadTokenKey);
-        if (previousUploadKey && previousToken) {
+        if (previousUploadKey) {
           formData.append('previousKey', previousUploadKey);
-          formData.append('previousToken', previousToken);
+          if (previousToken) formData.append('previousToken', previousToken);
         }
 
         const response = await fetch(`${PHOTO_API_URL.replace(/\/$/, '')}/upload`, {
@@ -100,7 +100,11 @@ export function renderPhotoChallenge(
         const result = await response.json();
         if (result.key) localStorage.setItem(uploadedKey, result.key);
         if (result.replaceToken) localStorage.setItem(uploadTokenKey, result.replaceToken);
-        feedback('Photo uploaded successfully!', true);
+        if (previousUploadKey && result.replaced === false) {
+          feedback('Photo uploaded, but the previous photo could not be removed. Please ask the organizer to remove it.', true);
+        } else {
+          feedback('Photo uploaded successfully!', true);
+        }
       } else {
         feedback('Demo photo accepted locally. Real uploads require a backend.', true);
       }

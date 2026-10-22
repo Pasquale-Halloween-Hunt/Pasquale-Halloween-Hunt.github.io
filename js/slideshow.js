@@ -2,6 +2,8 @@ import { PHOTO_API_URL } from './config.js';
 import { PhotoQueue } from './slideshow-queue.js';
 
 const slide = document.querySelector('#slide');
+const nextSlide = document.querySelector('#slide-next');
+const slides = [slide, nextSlide];
 const empty = document.querySelector('#empty');
 const login = document.querySelector('#slide-login');
 const loginError = document.querySelector('#slide-login-error');
@@ -10,8 +12,20 @@ let token = sessionStorage.getItem(tokenKey) || '';
 let authorized = false;
 let queue = new PhotoQueue();
 let refreshPromise = null;
-let slideUrl = null;
+let slideUrls = [null, null];
+let activeIndex = -1;
 let showVersion = 0;
+
+function clearSlides() {
+  slides.forEach((image, index) => {
+    image.style.display = 'none';
+    image.style.opacity = '0';
+    image.removeAttribute('src');
+    if (slideUrls[index]) URL.revokeObjectURL(slideUrls[index]);
+    slideUrls[index] = null;
+  });
+  activeIndex = -1;
+}
 
 function showLogin(message = '') {
   authorized = false;
@@ -20,11 +34,8 @@ function showLogin(message = '') {
   login.classList.remove('hidden');
   loginError.textContent = message;
   empty.style.display = 'none';
-  slide.style.display = 'none';
-  slide.classList.remove('fade-out');
-  slide.removeAttribute('src');
-  if (slideUrl) URL.revokeObjectURL(slideUrl);
-  slideUrl = null;
+  showVersion++;
+  clearSlides();
   queue = new PhotoQueue();
 }
 
@@ -58,11 +69,7 @@ async function folderPhotos(challenge) {
 async function show(item) {
   const version = ++showVersion;
   if (!item) {
-    slide.style.display = 'none';
-    slide.classList.remove('fade-out');
-    slide.removeAttribute('src');
-    if (slideUrl) URL.revokeObjectURL(slideUrl);
-    slideUrl = null;
+    clearSlides();
     empty.textContent = 'Waiting for photos…';
     empty.style.display = 'block';
     return;
@@ -71,27 +78,38 @@ async function show(item) {
     const blob = await (await api(`/photo/${encodeURIComponent(item.key)}`)).blob();
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) return;
     const nextUrl = URL.createObjectURL(blob);
-    const previousUrl = slideUrl;
-    const hadOutgoingSlide = Boolean(previousUrl);
-    if (hadOutgoingSlide) {
-      slide.classList.add('fade-out');
-      await new Promise(resolve => setTimeout(resolve, 900));
-    } else slide.classList.add('fade-out');
+    const incomingIndex = activeIndex === 0 ? 1 : 0;
+    const incoming = slides[incomingIndex];
+    const outgoing = activeIndex >= 0 ? slides[activeIndex] : null;
+    incoming.src = nextUrl;
+    incoming.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
+    await incoming.decode();
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) {
       URL.revokeObjectURL(nextUrl);
       return;
     }
-    slide.src = nextUrl;
-    await slide.decode();
+    incoming.style.display = 'block';
+    incoming.style.opacity = '0';
+    if (outgoing) outgoing.style.opacity = '1';
+    void incoming.offsetWidth;
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    incoming.style.opacity = '1';
+    if (outgoing) outgoing.style.opacity = '0';
+    await new Promise(resolve => setTimeout(resolve, 950));
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) {
       URL.revokeObjectURL(nextUrl);
       return;
     }
-    slideUrl = nextUrl;
-    if (previousUrl) URL.revokeObjectURL(previousUrl);
-    slide.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
-    slide.style.display = 'block';
-    requestAnimationFrame(() => slide.classList.remove('fade-out'));
+    activeIndex = incomingIndex;
+    slideUrls[incomingIndex] = nextUrl;
+    if (outgoing) {
+      const outgoingIndex = 1 - incomingIndex;
+      outgoing.style.display = 'none';
+      outgoing.style.opacity = '0';
+      outgoing.removeAttribute('src');
+      if (slideUrls[outgoingIndex]) URL.revokeObjectURL(slideUrls[outgoingIndex]);
+      slideUrls[outgoingIndex] = null;
+    }
     empty.style.display = 'none';
   } catch (error) {
     if (version !== showVersion) return;
@@ -144,7 +162,7 @@ window.addEventListener('message', event => {
 });
 window.opener?.postMessage({ type: 'slideshow-ready' }, location.origin);
 
-slide.addEventListener('error', () => {
+for (const image of slides) image.addEventListener('error', () => {
   if (queue.known.size > 1) void show(queue.next());
   else { empty.textContent = 'Waiting for photos…'; empty.style.display = 'block'; }
 });
@@ -163,5 +181,7 @@ setInterval(async () => {
   if (!authorized) return;
   const previousKey = queue.current?.key;
   await refresh();
-  if (authorized && queue.current && queue.current.key === previousKey) void show(queue.next());
+  if (authorized && queue.known.size > 1 && queue.current && queue.current.key === previousKey) {
+    void show(queue.next());
+  }
 }, 10000);

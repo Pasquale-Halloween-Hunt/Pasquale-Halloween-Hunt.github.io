@@ -31,7 +31,7 @@ Photo challenges #5 and #10 upload JPEGs to the Cloudflare Worker configured in 
 
 The directory, slideshow, and image endpoints require a Cloudflare Worker secret named `ADMIN_TOKEN`. Set a long, random value in the Worker's **Settings → Variables and Secrets**. Enter it in the directory login; the page keeps it only for the current browser tab and passes it to the slideshow window on the same site. A direct visit to the slideshow asks for it. The Worker will return a 503 for organizer actions until the secret is set. Keep this token private. Player uploads do not require it.
 
-The upload endpoint now issues a separate replacement token for each uploaded photo. It will delete a previous upload only when the browser provides that token. Older uploads made before this change have no replacement token, so re-uploading from the same browser may leave the earlier image in the directory; an organizer can remove it there.
+The upload endpoint issues a separate replacement token for each uploaded photo and uses it to verify future replacements. For older uploads without a token, the saved unguessable object key allows a one-time replacement in the same challenge folder. The upload response reports whether it removed the earlier photo.
 
 ## Other notes
 

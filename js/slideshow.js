@@ -92,9 +92,11 @@ async function show(item) {
     incoming.style.opacity = '0';
     if (outgoing) outgoing.style.opacity = '1';
     void incoming.offsetWidth;
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    incoming.style.opacity = '1';
-    if (outgoing) outgoing.style.opacity = '0';
+    await new Promise(resolve => requestAnimationFrame(() => {
+      incoming.style.opacity = '1';
+      if (outgoing) outgoing.style.opacity = '0';
+      resolve();
+    }));
     await new Promise(resolve => setTimeout(resolve, 950));
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) {
       URL.revokeObjectURL(nextUrl);

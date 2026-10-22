@@ -118,11 +118,19 @@ test('organizer deletion removes the photo and skip marker', async () => {
   const env = { PHOTOS: bucket(), ADMIN_TOKEN: 'organizer-secret' };
   const photo = await upload(env);
   const headers = { Authorization: 'Bearer organizer-secret' };
+  const deletePath = `/admin/photo?key=${encodeURIComponent(photo.key)}`;
+  const unauthorized = await worker.fetch(request(deletePath, { method: 'DELETE' }), env);
+  assert.equal(unauthorized.status, 401);
+  const wrongToken = await worker.fetch(request(deletePath, {
+    method: 'DELETE', headers: { Authorization: 'Bearer wrong-token' },
+  }), env);
+  assert.equal(wrongToken.status, 401);
+  assert.ok(await env.PHOTOS.head(photo.key));
   await worker.fetch(request('/admin/skip', {
     method: 'POST', headers,
     body: JSON.stringify({ key: photo.key, skipped: true }),
   }), env);
-  const deleted = await worker.fetch(request(`/admin/photo?key=${encodeURIComponent(photo.key)}`, {
+  const deleted = await worker.fetch(request(deletePath, {
     method: 'DELETE', headers,
   }), env);
   assert.equal(deleted.status, 200);

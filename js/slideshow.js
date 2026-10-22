@@ -2,7 +2,6 @@ import { PHOTO_API_URL } from './config.js';
 import { PhotoQueue } from './slideshow-queue.js';
 
 const slide = document.querySelector('#slide');
-const nextSlide = document.querySelector('#slide-next');
 const empty = document.querySelector('#empty');
 const login = document.querySelector('#slide-login');
 const loginError = document.querySelector('#slide-login-error');
@@ -12,8 +11,6 @@ let authorized = false;
 let queue = new PhotoQueue();
 let refreshPromise = null;
 let slideUrl = null;
-let activeSlide = slide;
-let incomingSlide = nextSlide;
 let showVersion = 0;
 
 function showLogin(message = '') {
@@ -24,14 +21,10 @@ function showLogin(message = '') {
   loginError.textContent = message;
   empty.style.display = 'none';
   slide.style.display = 'none';
-  slide.classList.remove('shown', 'fade-out');
-  nextSlide.style.display = 'none';
-  nextSlide.classList.remove('shown', 'fade-out');
+  slide.classList.remove('fade-out');
   slide.removeAttribute('src');
   if (slideUrl) URL.revokeObjectURL(slideUrl);
   slideUrl = null;
-  activeSlide = slide;
-  incomingSlide = nextSlide;
   queue = new PhotoQueue();
 }
 
@@ -66,14 +59,10 @@ async function show(item) {
   const version = ++showVersion;
   if (!item) {
     slide.style.display = 'none';
-    slide.classList.remove('shown', 'fade-out');
-    nextSlide.style.display = 'none';
-    nextSlide.classList.remove('shown', 'fade-out');
+    slide.classList.remove('fade-out');
     slide.removeAttribute('src');
     if (slideUrl) URL.revokeObjectURL(slideUrl);
     slideUrl = null;
-    activeSlide = slide;
-    incomingSlide = nextSlide;
     empty.textContent = 'Waiting for photos…';
     empty.style.display = 'block';
     return;
@@ -83,33 +72,26 @@ async function show(item) {
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) return;
     const nextUrl = URL.createObjectURL(blob);
     const previousUrl = slideUrl;
-    const outgoingSlide = activeSlide;
-    const incoming = incomingSlide;
-    incoming.src = nextUrl;
-    incoming.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
-    incoming.style.display = 'block';
-    incoming.classList.remove('shown', 'fade-out');
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    const hadOutgoingSlide = outgoingSlide.style.display !== 'none' && outgoingSlide.hasAttribute('src');
-    incoming.classList.add('shown');
-    if (hadOutgoingSlide) outgoingSlide.classList.add('fade-out');
-    await new Promise(resolve => {
-      const finish = () => resolve();
-      incoming.addEventListener('transitionend', finish, { once: true });
-      setTimeout(finish, 1000);
-    });
+    const hadOutgoingSlide = Boolean(previousUrl);
+    if (hadOutgoingSlide) {
+      slide.classList.add('fade-out');
+      await new Promise(resolve => setTimeout(resolve, 900));
+    } else slide.classList.add('fade-out');
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) {
       URL.revokeObjectURL(nextUrl);
       return;
     }
-    incoming.classList.remove('fade-out');
-    activeSlide = incoming;
-    incomingSlide = outgoingSlide;
-    outgoingSlide.classList.remove('shown', 'fade-out');
-    outgoingSlide.style.display = 'none';
-    outgoingSlide.removeAttribute('src');
+    slide.src = nextUrl;
+    await slide.decode();
+    if (version !== showVersion || !authorized || queue.current?.key !== item.key) {
+      URL.revokeObjectURL(nextUrl);
+      return;
+    }
     slideUrl = nextUrl;
     if (previousUrl) URL.revokeObjectURL(previousUrl);
+    slide.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
+    slide.style.display = 'block';
+    requestAnimationFrame(() => slide.classList.remove('fade-out'));
     empty.style.display = 'none';
   } catch (error) {
     if (version !== showVersion) return;
@@ -162,7 +144,7 @@ window.addEventListener('message', event => {
 });
 window.opener?.postMessage({ type: 'slideshow-ready' }, location.origin);
 
-for (const image of [slide, nextSlide]) image.addEventListener('error', () => {
+slide.addEventListener('error', () => {
   if (queue.known.size > 1) void show(queue.next());
   else { empty.textContent = 'Waiting for photos…'; empty.style.display = 'block'; }
 });

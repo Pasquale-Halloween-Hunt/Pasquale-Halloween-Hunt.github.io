@@ -4,7 +4,6 @@ import { PhotoQueue } from './slideshow-queue.js';
 const slide = document.querySelector('#slide');
 const nextSlide = document.querySelector('#slide-next');
 const empty = document.querySelector('#empty');
-const count = document.querySelector('#slide-count');
 const login = document.querySelector('#slide-login');
 const loginError = document.querySelector('#slide-login-error');
 const tokenKey = 'halloween-gallery-token';
@@ -29,7 +28,6 @@ function showLogin(message = '') {
   slide.removeAttribute('src');
   if (slideUrl) URL.revokeObjectURL(slideUrl);
   slideUrl = null;
-  count.textContent = '';
   queue = new PhotoQueue();
 }
 
@@ -70,7 +68,6 @@ async function show(item) {
     slideUrl = null;
     empty.textContent = 'Waiting for photos…';
     empty.style.display = 'block';
-    count.textContent = '';
     return;
   }
   try {
@@ -106,7 +103,6 @@ async function show(item) {
     slide.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
     slide.style.display = 'block';
     empty.style.display = 'none';
-    count.textContent = `${queue.known.size} photos · challenges 5 and 10`;
   } catch (error) {
     if (version !== showVersion) return;
     if (error.status === 401 || error.status === 503) showLogin(error.message);
@@ -124,7 +120,6 @@ async function refresh() {
     const before = queue.current?.key;
     const current = queue.sync(photos);
     if (current?.key !== before) await show(current);
-    else count.textContent = `${queue.known.size} photos · challenges 5 and 10`;
   })().catch(error => {
     if (error.status === 401 || error.status === 503) showLogin(error.message);
     else if (!queue.current) { empty.textContent = error.message; empty.style.display = 'block'; }
@@ -168,9 +163,7 @@ fullscreenButton.addEventListener('click', () => {
   if (!document.fullscreenElement) void document.documentElement.requestFullscreen();
 });
 document.addEventListener('fullscreenchange', () => {
-  const slideCountText = document.querySelector('#slide-count');
   fullscreenButton.hidden = Boolean(document.fullscreenElement);
-  slideCountText.hidden = Boolean(document.fullscreenElement);
 });
 
 if (token) void start(token);

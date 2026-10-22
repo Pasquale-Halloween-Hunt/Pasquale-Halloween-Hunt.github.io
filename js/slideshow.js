@@ -23,6 +23,7 @@ function showLogin(message = '') {
   loginError.textContent = message;
   empty.style.display = 'none';
   slide.style.display = 'none';
+  slide.classList.remove('fade-out');
   nextSlide.style.display = 'none';
   nextSlide.classList.remove('fade-in');
   slide.removeAttribute('src');
@@ -63,6 +64,7 @@ async function show(item) {
   const version = ++showVersion;
   if (!item) {
     slide.style.display = 'none';
+    slide.classList.remove('fade-out');
     slide.removeAttribute('src');
     if (slideUrl) URL.revokeObjectURL(slideUrl);
     slideUrl = null;
@@ -81,7 +83,9 @@ async function show(item) {
     nextSlide.style.display = 'block';
     nextSlide.classList.remove('fade-in');
     await new Promise(resolve => requestAnimationFrame(resolve));
+    const hadOutgoingSlide = slide.style.display !== 'none' && slide.hasAttribute('src');
     nextSlide.classList.add('fade-in');
+    if (hadOutgoingSlide) slide.classList.add('fade-out');
     await new Promise(resolve => {
       const finish = () => resolve();
       nextSlide.addEventListener('transitionend', finish, { once: true });
@@ -94,6 +98,7 @@ async function show(item) {
     slideUrl = nextUrl;
     slide.src = nextUrl;
     slide.style.display = 'block';
+    slide.classList.remove('fade-out');
     nextSlide.classList.remove('fade-in');
     nextSlide.style.display = 'none';
     nextSlide.removeAttribute('src');

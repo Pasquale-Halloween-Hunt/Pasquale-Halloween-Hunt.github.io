@@ -33,12 +33,14 @@ input{min-width:0;flex:1;border:1px solid #866a8f;border-radius:10px;background:
 #slide,#slide-next{position:absolute;inset:0;width:100vw;height:100vh;object-fit:contain;display:none;opacity:1;transition:opacity 900ms ease}
 #slide-next{opacity:0;pointer-events:none}
 #slide-next.fade-in{display:block;opacity:1}
+#slide.fade-out{opacity:0}
 @media(prefers-reduced-motion:reduce){#slide,#slide-next{transition-duration:0ms}}
 #empty{font-size:clamp(1.5rem,4vw,3rem);text-align:center;padding:2rem}
 .slide-controls{position:absolute;bottom:1rem;right:1rem;display:flex;gap:1rem;align-items:center;padding:.5rem;background:#0009;border-radius:10px;opacity:.65;transition:opacity .2s}
 .slide-controls:hover,.slide-controls:focus-within{opacity:1}
 :fullscreen #fullscreen{display:none}
 #slide-count{font-size:.9rem;color:#fff}
+#slide-count[hidden],#fullscreen[hidden]{display:none!important}
 .slide-login{position:absolute;z-index:2;width:min(90vw,560px)}
 .slide-login h1{font-size:2rem}
 .slide-login #slide-login-error{min-height:1.5em;color:#ffd18a}

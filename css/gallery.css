@@ -30,10 +30,9 @@ input{min-width:0;flex:1;border:1px solid #866a8f;border-radius:10px;background:
 .photo-card .danger{border-color:#b94c55;background:#692b38}
 #status{min-height:1.5em}.hidden{display:none!important}
 .slideshow-page{background:#000}.stage{position:fixed;inset:0;background:#000;display:grid;place-items:center;padding:0;overflow:hidden}
-#slide,#slide-next{position:absolute;inset:0;width:100vw;height:100vh;object-fit:contain;display:none;opacity:1;transition:opacity 900ms ease}
-#slide-next{opacity:0;pointer-events:none}
-#slide-next.fade-in{display:block;opacity:1}
-#slide.fade-out{opacity:0}
+#slide,#slide-next{position:absolute;inset:0;width:100vw;height:100vh;object-fit:contain;display:none;opacity:0;transition:opacity 900ms ease}
+#slide.shown,#slide-next.shown{display:block;opacity:1}
+#slide.fade-out,#slide-next.fade-out{opacity:0}
 @media(prefers-reduced-motion:reduce){#slide,#slide-next{transition-duration:0ms}}
 #empty{font-size:clamp(1.5rem,4vw,3rem);text-align:center;padding:2rem}
 .slide-controls{position:absolute;bottom:1rem;right:1rem;display:flex;gap:1rem;align-items:center;padding:.5rem;background:#0009;border-radius:10px;opacity:.65;transition:opacity .2s}

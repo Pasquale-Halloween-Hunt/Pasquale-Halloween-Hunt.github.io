@@ -12,6 +12,8 @@ let authorized = false;
 let queue = new PhotoQueue();
 let refreshPromise = null;
 let slideUrl = null;
+let activeSlide = slide;
+let incomingSlide = nextSlide;
 let showVersion = 0;
 
 function showLogin(message = '') {
@@ -22,12 +24,14 @@ function showLogin(message = '') {
   loginError.textContent = message;
   empty.style.display = 'none';
   slide.style.display = 'none';
-  slide.classList.remove('fade-out');
+  slide.classList.remove('shown', 'fade-out');
   nextSlide.style.display = 'none';
-  nextSlide.classList.remove('fade-in');
+  nextSlide.classList.remove('shown', 'fade-out');
   slide.removeAttribute('src');
   if (slideUrl) URL.revokeObjectURL(slideUrl);
   slideUrl = null;
+  activeSlide = slide;
+  incomingSlide = nextSlide;
   queue = new PhotoQueue();
 }
 
@@ -62,10 +66,14 @@ async function show(item) {
   const version = ++showVersion;
   if (!item) {
     slide.style.display = 'none';
-    slide.classList.remove('fade-out');
+    slide.classList.remove('shown', 'fade-out');
+    nextSlide.style.display = 'none';
+    nextSlide.classList.remove('shown', 'fade-out');
     slide.removeAttribute('src');
     if (slideUrl) URL.revokeObjectURL(slideUrl);
     slideUrl = null;
+    activeSlide = slide;
+    incomingSlide = nextSlide;
     empty.textContent = 'Waiting for photos…';
     empty.style.display = 'block';
     return;
@@ -75,33 +83,33 @@ async function show(item) {
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) return;
     const nextUrl = URL.createObjectURL(blob);
     const previousUrl = slideUrl;
-    nextSlide.src = nextUrl;
-    nextSlide.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
-    nextSlide.style.display = 'block';
-    nextSlide.classList.remove('fade-in');
+    const outgoingSlide = activeSlide;
+    const incoming = incomingSlide;
+    incoming.src = nextUrl;
+    incoming.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
+    incoming.style.display = 'block';
+    incoming.classList.remove('shown', 'fade-out');
     await new Promise(resolve => requestAnimationFrame(resolve));
-    const hadOutgoingSlide = slide.style.display !== 'none' && slide.hasAttribute('src');
-    nextSlide.classList.add('fade-in');
-    if (hadOutgoingSlide) slide.classList.add('fade-out');
+    const hadOutgoingSlide = outgoingSlide.style.display !== 'none' && outgoingSlide.hasAttribute('src');
+    incoming.classList.add('shown');
+    if (hadOutgoingSlide) outgoingSlide.classList.add('fade-out');
     await new Promise(resolve => {
       const finish = () => resolve();
-      nextSlide.addEventListener('transitionend', finish, { once: true });
+      incoming.addEventListener('transitionend', finish, { once: true });
       setTimeout(finish, 1000);
     });
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) {
       URL.revokeObjectURL(nextUrl);
       return;
     }
+    incoming.classList.remove('fade-out');
+    activeSlide = incoming;
+    incomingSlide = outgoingSlide;
+    outgoingSlide.classList.remove('shown', 'fade-out');
+    outgoingSlide.style.display = 'none';
+    outgoingSlide.removeAttribute('src');
     slideUrl = nextUrl;
-    slide.src = nextUrl;
-    slide.style.display = 'block';
-    slide.classList.remove('fade-out');
-    nextSlide.classList.remove('fade-in');
-    nextSlide.style.display = 'none';
-    nextSlide.removeAttribute('src');
     if (previousUrl) URL.revokeObjectURL(previousUrl);
-    slide.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
-    slide.style.display = 'block';
     empty.style.display = 'none';
   } catch (error) {
     if (version !== showVersion) return;
@@ -154,7 +162,7 @@ window.addEventListener('message', event => {
 });
 window.opener?.postMessage({ type: 'slideshow-ready' }, location.origin);
 
-slide.addEventListener('error', () => {
+for (const image of [slide, nextSlide]) image.addEventListener('error', () => {
   if (queue.known.size > 1) void show(queue.next());
   else { empty.textContent = 'Waiting for photos…'; empty.style.display = 'block'; }
 });
@@ -174,4 +182,4 @@ setInterval(async () => {
   const previousKey = queue.current?.key;
   await refresh();
   if (authorized && queue.current && queue.current.key === previousKey) void show(queue.next());
-}, 6500);
+}, 10000);

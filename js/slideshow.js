@@ -136,9 +136,12 @@ slide.addEventListener('error', () => {
   if (queue.known.size > 1) void show(queue.next());
   else { empty.textContent = 'Waiting for photos…'; empty.style.display = 'block'; }
 });
-document.querySelector('#fullscreen').addEventListener('click', () => {
-  if (document.fullscreenElement) document.exitFullscreen();
-  else document.documentElement.requestFullscreen();
+const fullscreenButton = document.querySelector('#fullscreen');
+fullscreenButton.addEventListener('click', () => {
+  if (!document.fullscreenElement) void document.documentElement.requestFullscreen();
+});
+document.addEventListener('fullscreenchange', () => {
+  fullscreenButton.hidden = Boolean(document.fullscreenElement);
 });
 
 if (token) void start(token);

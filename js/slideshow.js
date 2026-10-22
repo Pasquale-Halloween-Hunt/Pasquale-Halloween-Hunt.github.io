@@ -163,7 +163,9 @@ fullscreenButton.addEventListener('click', () => {
   if (!document.fullscreenElement) void document.documentElement.requestFullscreen();
 });
 document.addEventListener('fullscreenchange', () => {
+  const slideCountText = document.querySelector('#slide-count');
   fullscreenButton.hidden = Boolean(document.fullscreenElement);
+  slideCountText.hidden = Boolean(document.fullscreenElement);
 });
 
 if (token) void start(token);

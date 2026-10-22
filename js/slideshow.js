@@ -79,8 +79,14 @@ async function show(item) {
     nextSlide.src = nextUrl;
     nextSlide.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
     nextSlide.style.display = 'block';
+    nextSlide.classList.remove('fade-in');
+    await new Promise(resolve => requestAnimationFrame(resolve));
     nextSlide.classList.add('fade-in');
-    await new Promise(resolve => setTimeout(resolve, 900));
+    await new Promise(resolve => {
+      const finish = () => resolve();
+      nextSlide.addEventListener('transitionend', finish, { once: true });
+      setTimeout(finish, 1000);
+    });
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) {
       URL.revokeObjectURL(nextUrl);
       return;

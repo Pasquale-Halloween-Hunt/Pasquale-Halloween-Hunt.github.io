@@ -2,6 +2,7 @@ import { PHOTO_API_URL } from './config.js';
 import { PhotoQueue } from './slideshow-queue.js';
 
 const slide = document.querySelector('#slide');
+const nextSlide = document.querySelector('#slide-next');
 const empty = document.querySelector('#empty');
 const count = document.querySelector('#slide-count');
 const login = document.querySelector('#slide-login');
@@ -22,6 +23,8 @@ function showLogin(message = '') {
   loginError.textContent = message;
   empty.style.display = 'none';
   slide.style.display = 'none';
+  nextSlide.style.display = 'none';
+  nextSlide.classList.remove('fade-in');
   slide.removeAttribute('src');
   if (slideUrl) URL.revokeObjectURL(slideUrl);
   slideUrl = null;
@@ -73,8 +76,21 @@ async function show(item) {
     if (version !== showVersion || !authorized || queue.current?.key !== item.key) return;
     const nextUrl = URL.createObjectURL(blob);
     const previousUrl = slideUrl;
+    nextSlide.src = nextUrl;
+    nextSlide.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
+    nextSlide.style.display = 'block';
+    nextSlide.classList.add('fade-in');
+    await new Promise(resolve => setTimeout(resolve, 900));
+    if (version !== showVersion || !authorized || queue.current?.key !== item.key) {
+      URL.revokeObjectURL(nextUrl);
+      return;
+    }
     slideUrl = nextUrl;
     slide.src = nextUrl;
+    slide.style.display = 'block';
+    nextSlide.classList.remove('fade-in');
+    nextSlide.style.display = 'none';
+    nextSlide.removeAttribute('src');
     if (previousUrl) URL.revokeObjectURL(previousUrl);
     slide.alt = item.challenge === 5 ? 'Bird photo from the Halloween Hunt' : 'Tractor photo from the Halloween Hunt';
     slide.style.display = 'block';

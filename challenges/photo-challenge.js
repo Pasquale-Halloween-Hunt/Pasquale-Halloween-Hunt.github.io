@@ -2,7 +2,7 @@ import { PHOTO_API_URL } from '../js/config.js';
 
 async function shrinkImage(file) {
   const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+  const scale = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement('canvas');
 
   canvas.width = Math.round(bitmap.width * scale);
@@ -14,7 +14,7 @@ async function shrinkImage(file) {
     canvas.toBlob(
       blob => blob ? resolve(blob) : reject(Error('Image conversion failed')),
       'image/jpeg',
-      0.78,
+      0.82,
     );
   });
 }
@@ -25,7 +25,10 @@ export function renderPhotoChallenge(
 ) {
   const photoKey = `photo-challenge-${number}`;
   const uploadedKey = `photo-upload-key-${number}`;
-  const savedPhoto = localStorage.getItem(photoKey);
+  const uploadTokenKey = `photo-upload-token-${number}`;
+  // Clear image data saved by older versions; only small upload keys remain locally.
+  localStorage.removeItem(photoKey);
+  const hasUpload = Boolean(localStorage.getItem(uploadedKey));
   const status = PHOTO_API_URL
     ? 'Your photo will be uploaded to the event gallery.'
     : 'Demo mode: no photo server is configured. Your photo will be previewed locally only.';
@@ -35,14 +38,14 @@ export function renderPhotoChallenge(
     <div class="center ornament">${ornament}</div>
     <p class="lead center">${instructions}</p>
     <p class="notice center">
-      Photos submitted to the event may be displayed on the public photo slideshow.
+      Photos submitted to the event may be displayed on the event slideshow.
       Please only upload photos you are comfortable sharing.
     </p>
     <div class="center">
-      <p class="tiny ${savedPhoto ? '' : 'hidden'}" id="replace-warning">Choosing a new photo will replace your current photo.</p>
-      <label for="photo" class="btn secondary">${savedPhoto ? 'Replace current photo' : 'Choose or take photo'}</label>
+      <p class="tiny ${hasUpload ? '' : 'hidden'}" id="replace-warning">Choosing a new photo will replace your current photo.</p>
+      <label for="photo" class="btn secondary">${hasUpload ? 'Replace current photo' : 'Choose or take photo'}</label>
       <input type="file" id="photo" accept="image/*" class="hidden">
-      <img id="preview" class="upload-preview${savedPhoto ? '' : ' hidden'}" src="${savedPhoto || ''}" alt="Your current photo">
+      <img id="preview" class="upload-preview hidden" alt="Your selected photo">
       <p class="tiny" id="photo-status">${status}</p>
       <div class="button-row">
         <button class="btn" id="submit-photo" disabled>${buttonLabel}</button>
@@ -81,24 +84,26 @@ export function renderPhotoChallenge(
         formData.append('photo', blob, 'photo.jpg');
         formData.append('challenge', String(number));
         const previousUploadKey = localStorage.getItem(uploadedKey);
-        if (previousUploadKey) formData.append('previousKey', previousUploadKey);
+        const previousToken = localStorage.getItem(uploadTokenKey);
+        if (previousUploadKey && previousToken) {
+          formData.append('previousKey', previousUploadKey);
+          formData.append('previousToken', previousToken);
+        }
 
         const response = await fetch(`${PHOTO_API_URL.replace(/\/$/, '')}/upload`, {
           method: 'POST',
           body: formData,
+          cache: 'no-store',
         });
 
         if (!response.ok) throw Error(`Upload failed (${response.status})`);
         const result = await response.json();
         if (result.key) localStorage.setItem(uploadedKey, result.key);
+        if (result.replaceToken) localStorage.setItem(uploadTokenKey, result.replaceToken);
         feedback('Photo uploaded successfully!', true);
       } else {
         feedback('Demo photo accepted locally. Real uploads require a backend.', true);
       }
-
-      const reader = new FileReader();
-      reader.onload = () => localStorage.setItem(photoKey, reader.result);
-      reader.readAsDataURL(selected);
 
       setTimeout(() => {
         if (tag() === number) award(number);

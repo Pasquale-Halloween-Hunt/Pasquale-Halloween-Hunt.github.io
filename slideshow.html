@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Photo Slideshow · The Halloween Hunt</title>
+  <link rel="stylesheet" href="css/gallery.css">
+</head>
+<body class="slideshow-page">
+  <main class="stage">
+    <img id="slide" alt="Halloween Hunt photo">
+    <p id="empty">Waiting for photos…</p>
+    <section id="slide-login" class="panel slide-login hidden">
+      <h1>Organizer slideshow</h1>
+      <p>Enter the organizer token to play event photos.</p>
+      <form id="slide-login-form">
+        <label for="slide-token">Organizer token</label>
+        <div class="row">
+          <input id="slide-token" type="password" autocomplete="off" required>
+          <button type="submit">Start slideshow</button>
+        </div>
+      </form>
+      <p id="slide-login-error" role="alert"></p>
+    </section>
+    <div class="slide-controls">
+      <span id="slide-count"></span>
+      <button id="fullscreen" type="button">Full screen</button>
+    </div>
+  </main>
+  <script src="js/slideshow.js" type="module"></script>
+</body>
+</html>

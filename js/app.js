@@ -7,6 +7,10 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const DIFFICULTIES = ['normal', 'challenging', 'nightmare'];
 
+// Older versions stored full photo previews locally. Remove those on launch.
+localStorage.removeItem('photo-challenge-5');
+localStorage.removeItem('photo-challenge-10');
+
 let state;
 try {
   state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};

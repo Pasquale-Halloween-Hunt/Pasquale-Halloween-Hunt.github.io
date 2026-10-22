@@ -23,11 +23,15 @@ On the first visit, players choose Normal, Challenging, or Nightmare difficulty.
 - `challenges/` contains one JavaScript module per numbered challenge, plus a shared photo-challenge helper.
 - `assets/` is reserved for images, audio, video, fonts, and other static media.
 
-## IMPORTANT: Photo submissions are in DEMO MODE
+## Event photos
 
-Photo challenges #5 and #10 currently preview a selected image locally and allow **demo completion**, but **do not upload or store the photo**. For the actual event, deploy a photo backend and set `PHOTO_API_URL` near the top of `js/config.js`. The expected endpoint is `POST /upload` with multipart form fields `photo` (JPEG) and `challenge` (`5` or `10`). A real backend should enforce CORS for your GitHub Pages domain, content type/size checks, rate limits, safe public image delivery, and private organizer moderation. Do not use the demo completion mode at the event.
+Photo challenges #5 and #10 upload JPEGs to the Cloudflare Worker configured in `js/config.js`. The browser resizes new uploads to at most 2,400 pixels on the longest side at JPEG quality 0.82. The Worker source is tracked in `worker/worker.js` and uses the R2 bucket binding `PHOTOS` (`pasquale-halloween-photos`). Deploy that source to the `halloween-photo-upload` Worker before using the directory or slideshow.
 
-The live photo slideshow and organizer moderation interface are **not implemented in this prototype**. They require the backend and should be added before the event.
+`gallery.html` is the organizer directory. It shows a bird folder and a tractor folder, with skip/include, delete, individual download, folder ZIP, and both-folders ZIP actions. `slideshow.html` is the organizer's full-screen display. It always combines both folders. Existing photos rotate in a queue; new photos play next in upload order and then join that rotation. The display checks for changes every four seconds. Skipped and deleted photos leave the queue on refresh. Photo pages, scripts, lists, and images use network requests without caching; the slideshow needs a connection.
+
+The directory, slideshow, and image endpoints require a Cloudflare Worker secret named `ADMIN_TOKEN`. Set a long, random value in the Worker's **Settings → Variables and Secrets**. Enter it in the directory login; the page keeps it only for the current browser tab and passes it to the slideshow window on the same site. A direct visit to the slideshow asks for it. The Worker will return a 503 for organizer actions until the secret is set. Keep this token private. Player uploads do not require it.
+
+The upload endpoint now issues a separate replacement token for each uploaded photo. It will delete a previous upload only when the browser provides that token. Older uploads made before this change have no replacement token, so re-uploading from the same browser may leave the earlier image in the directory; an organizer can remove it there.
 
 ## Other notes
 

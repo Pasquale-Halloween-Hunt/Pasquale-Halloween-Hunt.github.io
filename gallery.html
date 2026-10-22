@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Photo Directory · The Halloween Hunt</title>
+  <link rel="stylesheet" href="css/gallery.css">
+</head>
+<body>
+  <header class="bar">
+    <a class="brand" href="./">☾ THE HALLOWEEN HUNT</a>
+    <span>Photo directory</span>
+  </header>
+  <main class="layout">
+    <section id="login" class="panel login">
+      <h1>Organizer photo directory</h1>
+      <p>Enter the organizer token to manage and download event photos.</p>
+      <form id="login-form">
+        <label for="admin-token">Organizer token</label>
+        <div class="row">
+          <input id="admin-token" type="password" autocomplete="off" required>
+          <button type="submit">Open directory</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="directory" class="hidden">
+      <div class="heading-row">
+        <div>
+          <p class="eyebrow">Event photos</p>
+          <h1 id="page-title">Choose a folder</h1>
+        </div>
+        <button id="lock" class="subtle" type="button">Lock directory</button>
+      </div>
+      <div id="folders" class="folders">
+        <button class="folder" data-challenge="5" type="button"><span class="icon">🐦</span><strong>Bird photos</strong><small>Challenge 5 · Familiar</small></button>
+        <button class="folder" data-challenge="10" type="button"><span class="icon">🚜</span><strong>Tractor photos</strong><small>Challenge 10 · Joyride</small></button>
+      </div>
+      <div id="folder-view" class="hidden">
+        <div class="actions">
+          <button id="back-folders" class="subtle" type="button">← Folders</button>
+          <button id="download-folder" type="button">Download folder</button>
+          <button id="download-all" class="subtle" type="button">Download both folders</button>
+          <button id="start-slideshow" type="button">Start slideshow ↗</button>
+        </div>
+        <div id="grid" class="grid"></div>
+        <button id="load-more" class="subtle hidden" type="button">Load more images</button>
+      </div>
+    </section>
+    <p id="status" role="status" aria-live="polite"></p>
+  </main>
+  <script src="js/gallery.js" type="module"></script>
+</body>
+</html>

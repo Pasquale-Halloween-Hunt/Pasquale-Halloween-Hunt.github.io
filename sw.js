@@ -2,7 +2,7 @@
 
 // Bump this name whenever a cached file changes so returning players receive
 // the new version as one complete, consistent set of files.
-const CACHE_NAME = 'halloween-hunt-v1';
+const CACHE_NAME = 'halloween-hunt-v2';
 
 const APP_FILES = [
   './',
@@ -29,6 +29,15 @@ const APP_FILES = [
 
 const appUrls = APP_FILES.map(path => new URL(path, self.registration.scope).href);
 const indexUrl = new URL('./index.html', self.registration.scope).href;
+const uncachedPhotoFiles = new Set([
+  'gallery.html',
+  'slideshow.html',
+  'css/gallery.css',
+  'js/gallery.js',
+  'js/slideshow.js',
+  'js/slideshow-queue.js',
+  'js/zip.js',
+]);
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -54,6 +63,12 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  const relativePath = url.pathname.slice(new URL(self.registration.scope).pathname.length);
+  if (uncachedPhotoFiles.has(relativePath)) {
+    event.respondWith(fetch(request, { cache: 'no-store' }));
+    return;
+  }
 
   if (request.mode === 'navigate') {
     // Every in-app route is rendered by index.html. Ignoring its query string

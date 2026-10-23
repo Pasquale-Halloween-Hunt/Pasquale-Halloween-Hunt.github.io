@@ -12,7 +12,7 @@ export default function monsters({ app, $$, frame, feedback, award, difficulty }
       suspects: [
         ['Werewolf', '🐺', 'I (🐺) didn\'t steal the charm'],
         ['Ogre', '👹', 'The Zombie (🧟) is innocent!'],
-        ['Zombie', '🧟', 'The Werewolf (🐺) stole the pumpkin.'],
+        ['Zombie', '🧟', 'The Werewolf (🐺) stole the charm.'],
         
       ],
       answer: 'Zombie',
@@ -20,7 +20,7 @@ export default function monsters({ app, $$, frame, feedback, award, difficulty }
     nightmare: {
       suspects: [
         ['Dragon', '🐉', 'The Elf (🧝) stole the charm, and he\'s (🧝) lying!'],
-        ['Elf', '🧝', 'Either the Dragon (🐉) or the Skeleton (💀) stole the pumpkin!'],
+        ['Elf', '🧝', 'Either the Dragon (🐉) or the Skeleton (💀) stole the charm!'],
         ['Skeleton', '💀', 'The Dragon (🐉) is lying!'],
         
       ],

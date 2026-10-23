@@ -411,7 +411,10 @@ function home() {
 
     const resetFinalAnswer = () => {
       $('#final-answer').value = '';
-      slots.forEach(slot => { slot.textContent = ''; });
+      slots.forEach(slot => {
+        slot.textContent = '';
+        delete slot.dataset.number;
+      });
       $$('.letter-tile').forEach(tile => tile.classList.remove('hidden'));
     };
 
@@ -420,6 +423,7 @@ function home() {
       const slot = slots.find(item => !item.textContent);
       if (slot) {
         slot.textContent = tile.textContent;
+        slot.dataset.number = tile.dataset.number;
         tile.classList.add('hidden');
       }
       if (slots.map(item => item.textContent).join('') === 'TRICKORTREAT') showVictory('TRICKORTREAT');
@@ -427,9 +431,9 @@ function home() {
 
     slots.forEach(slot => slot.addEventListener('click', () => {
       if (dragMode) return;
-      const letter = slot.textContent;
+      const tile = $(`[data-number="${slot.dataset.number}"]`);
       slot.textContent = '';
-      const tile = [...$$('.letter-tile')].find(item => item.textContent === letter && item.classList.contains('hidden'));
+      delete slot.dataset.number;
       if (tile) {
         tile.classList.remove('hidden');
         tile.parentNode.append(tile);

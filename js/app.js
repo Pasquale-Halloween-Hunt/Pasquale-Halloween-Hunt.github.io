@@ -468,14 +468,39 @@ function home() {
         if (!dragMode) return;
         event.preventDefault();
         const rack = tile.parentNode;
+        const bounds = tile.getBoundingClientRect();
+        const placeholder = document.createElement('div');
+        placeholder.className = 'letter-tile-placeholder';
+        placeholder.style.width = `${bounds.width}px`;
+        placeholder.style.height = `${bounds.height}px`;
+        tile.replaceWith(placeholder);
+        document.body.append(tile);
+        tile.classList.add('dragging');
+        tile.style.left = `${bounds.left}px`;
+        tile.style.top = `${bounds.top}px`;
+        tile.style.width = `${bounds.width}px`;
+        tile.style.height = `${bounds.height}px`;
         const startX = event.clientX;
         const startY = event.clientY;
         let moved = false;
         const move = moveEvent => {
           if (Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY) > 6) moved = true;
+          tile.style.left = `${moveEvent.clientX - bounds.width / 2}px`;
+          tile.style.top = `${moveEvent.clientY - bounds.height / 2}px`;
+          const target = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY)?.closest('.letter-tile');
+          if (target && target !== tile && target.parentNode === rack) {
+            rack.insertBefore(placeholder, target);
+          } else {
+            const tiles = [...rack.querySelectorAll('.letter-tile')];
+            const last = tiles[tiles.length - 1];
+            if (last && moveEvent.clientX > last.getBoundingClientRect().right) rack.append(placeholder);
+          }
         };
         const end = endEvent => {
           window.removeEventListener('pointermove', move);
+          tile.classList.remove('dragging');
+          tile.style = '';
+          placeholder.replaceWith(tile);
           if (!moved) return;
           const target = document.elementFromPoint(endEvent.clientX, endEvent.clientY)?.closest('.letter-tile');
           if (target && target !== tile && target.parentNode === rack) {

@@ -770,9 +770,15 @@ h3 {
 }
 
 .cauldron .brew {
+  width:100%;
+  min-height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:nowrap;
+  white-space:nowrap;
   font-size:25px;
-  letter-spacing:5px;
-  min-height:32px
+  letter-spacing:0
 }
 
 .cauldron.drag-over .rim {

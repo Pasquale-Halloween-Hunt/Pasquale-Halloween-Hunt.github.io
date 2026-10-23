@@ -357,6 +357,7 @@ function home() {
   // Keep the collected-letter rack rearrangeable as letters are earned.
   $$('.letter-tile').forEach(tile => {
     tile.addEventListener('pointerdown', event => {
+      if (state.solved.length === CHALLENGES.length) return;
       event.preventDefault();
       const rack = tile.parentNode;
       const bounds = tile.getBoundingClientRect();
@@ -443,6 +444,7 @@ function home() {
     $('#toggle-letter-mode').addEventListener('click', () => {
       resetFinalAnswer();
       dragMode = !dragMode;
+      $$('.letter-tile').forEach(tile => { tile.draggable = dragMode; });
       $('#letter-slots').classList.toggle('hidden', dragMode);
       $('#toggle-letter-mode').textContent = dragMode ? 'Use click mode' : 'Use drag mode';
     });
@@ -470,7 +472,13 @@ function home() {
         window.addEventListener('pointermove', move);
         window.addEventListener('pointerup', end, { once: true });
       });
-      tile.addEventListener('dragstart', event => event.dataTransfer.setData('text/plain', tile.dataset.number));
+      tile.addEventListener('dragstart', event => {
+        if (!dragMode) {
+          event.preventDefault();
+          return;
+        }
+        event.dataTransfer.setData('text/plain', tile.dataset.number);
+      });
       tile.addEventListener('dragover', event => event.preventDefault());
       tile.addEventListener('drop', event => {
         event.preventDefault();

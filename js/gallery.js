@@ -175,7 +175,7 @@ async function openFolder(number) {
   clearImages();
   observeImages();
   $('#page-title').textContent = folders[number];
-  $('#folders').classList.add('hidden');
+  $('.chooser-layout').classList.add('hidden');
   $('#folder-view').classList.remove('hidden');
   status('Loading photos…');
   try { await loadPage(); if ($('#grid').children.length) status(''); }
@@ -233,7 +233,7 @@ document.querySelectorAll('.folder').forEach(folder => {
 $('#back-folders').addEventListener('click', () => {
   clearImages();
   $('#folder-view').classList.add('hidden');
-  $('#folders').classList.remove('hidden');
+  $('.chooser-layout').classList.remove('hidden');
   $('#page-title').textContent = 'Choose a folder';
   status('');
 });

@@ -20,7 +20,7 @@ const RIDDLES = {
     `,
   },
   nightmare: {
-    answer: 'FOOTSTEPS',
+    answer: ['FOOTSTEPS', 'FOOTSTEP'],
     prompt: `
       The more you take,<br>
       The more you leave behind.<br>

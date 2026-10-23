@@ -26,8 +26,6 @@ export function renderPhotoChallenge(
   const photoKey = `photo-challenge-${number}`;
   const uploadedKey = `photo-upload-key-${number}`;
   const uploadTokenKey = `photo-upload-token-${number}`;
-  // Clear image data saved by older versions; only small upload keys remain locally.
-  localStorage.removeItem(photoKey);
   const hasUpload = Boolean(localStorage.getItem(uploadedKey));
   const status = PHOTO_API_URL
     ? 'Your photo will be uploaded to the event gallery.'
@@ -57,12 +55,35 @@ export function renderPhotoChallenge(
   let selected = null;
   let previewUrl = null;
 
+  try {
+    const savedPreview = localStorage.getItem(photoKey);
+    if (savedPreview) {
+      $('#preview').src = savedPreview;
+      $('#preview').alt = 'Your saved photo';
+      $('#preview').classList.remove('hidden');
+      $('#photo-status').textContent = 'Your saved photo';
+    }
+  } catch {
+    // The player can still choose a photo if browser storage is unavailable.
+  }
+
   $('#photo').addEventListener('change', event => {
     selected = event.target.files?.[0];
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     if (!selected) return;
 
     previewUrl = URL.createObjectURL(selected);
+    shrinkImage(selected).then(blob => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          localStorage.setItem(photoKey, reader.result);
+        } catch {
+          $('#photo-status').textContent = 'Photo selected. Browser storage is full, so it may not be saved for later.';
+        }
+      };
+      reader.readAsDataURL(blob);
+    }).catch(() => {});
     $('#preview').src = previewUrl;
     $('#preview').alt = 'Your new photo';
     $('#preview').classList.remove('hidden');

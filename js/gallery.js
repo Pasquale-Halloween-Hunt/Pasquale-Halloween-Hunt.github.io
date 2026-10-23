@@ -248,10 +248,12 @@ $('#download-folder').addEventListener('click', () => {
   else downloadArchive([challenge], `${challenge === '5' ? 'birds' : 'skeletons'}-photos.zip`);
 });
 $('#download-all').addEventListener('click', () => downloadArchive(['5', '10'], 'halloween-hunt-photos.zip'));
-$('#start-slideshow').addEventListener('click', () => {
+function startSlideshow() {
   slideshowWindow = window.open('slideshow.html', 'halloween-slideshow');
   if (!slideshowWindow) status('Allow pop-ups to open the slideshow.');
-});
+}
+$('#start-slideshow').addEventListener('click', startSlideshow);
+$('#start-folder-slideshow').addEventListener('click', startSlideshow);
 window.addEventListener('message', event => {
   if (event.origin === location.origin && event.source === slideshowWindow &&
       event.data?.type === 'slideshow-ready' && token) {

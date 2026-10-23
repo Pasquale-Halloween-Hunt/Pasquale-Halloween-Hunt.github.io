@@ -35,13 +35,16 @@
       <div id="folders" class="folders">
         <button class="folder" data-challenge="5" type="button"><span class="icon">🐦</span><strong>Bird photos</strong><small>Challenge 5 · Familiar</small></button>
         <button class="folder" data-challenge="10" type="button"><span class="icon">🚜</span><strong>Tractor photos</strong><small>Challenge 10 · Joyride</small></button>
+        <button class="folder" data-challenge="all" type="button"><span class="icon">🖼️</span><strong>View all</strong><small>Browse every event photo</small></button>
+        <div class="folder-actions actions">
+          <button id="start-slideshow" type="button">Start slideshow ↗</button>
+          <button id="download-all" class="subtle" type="button">Download all photos</button>
+        </div>
       </div>
       <div id="folder-view" class="hidden">
         <div class="actions">
           <button id="back-folders" class="subtle" type="button">← Folders</button>
           <button id="download-folder" type="button">Download folder</button>
-          <button id="download-all" class="subtle" type="button">Download both folders</button>
-          <button id="start-slideshow" type="button">Start slideshow ↗</button>
         </div>
         <div id="grid" class="grid"></div>
         <button id="load-more" class="subtle hidden" type="button">Load more images</button>

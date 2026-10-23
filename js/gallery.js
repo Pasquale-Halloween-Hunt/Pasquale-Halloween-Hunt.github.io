@@ -3,10 +3,11 @@ import { createZip } from './zip.js';
 
 const $ = selector => document.querySelector(selector);
 const tokenKey = 'halloween-gallery-token';
-const folders = { '5': 'Bird photos', '10': 'Tractor photos' };
+const folders = { '5': 'Bird photos', '10': 'Tractor photos', all: 'View all photos' };
 let token = sessionStorage.getItem(tokenKey) || '';
 let challenge = null;
 let nextCursor = null;
+let allCursors = { '5': null, '10': null };
 let observer = null;
 let slideshowWindow = null;
 const imageUrls = new Set();
@@ -142,6 +143,22 @@ function observeImages() {
 }
 
 async function loadPage() {
+  if (challenge === 'all') {
+    let hasMore = false;
+    for (const number of ['5', '10']) {
+      if (allCursors[number] === false) continue;
+      const parameters = new URLSearchParams({ challenge: number, limit: '40' });
+      if (allCursors[number]) parameters.set('cursor', allCursors[number]);
+      const data = await (await api(`/admin/photos?${parameters}`)).json();
+      allCursors[number] = data.nextCursor || false;
+      hasMore ||= Boolean(data.nextCursor);
+      for (const item of data.items) renderCard(item);
+    }
+    nextCursor = hasMore ? 'all' : null;
+    $('#load-more').classList.toggle('hidden', !hasMore);
+    if (!$('#grid').children.length) status('No photos have been uploaded yet.');
+    return;
+  }
   const parameters = new URLSearchParams({ challenge, limit: '40' });
   if (nextCursor) parameters.set('cursor', nextCursor);
   const data = await (await api(`/admin/photos?${parameters}`)).json();
@@ -154,6 +171,7 @@ async function loadPage() {
 async function openFolder(number) {
   challenge = number;
   nextCursor = null;
+  allCursors = { '5': null, '10': null };
   clearImages();
   observeImages();
   $('#page-title').textContent = folders[number];
@@ -225,7 +243,10 @@ $('#load-more').addEventListener('click', async () => {
   catch (error) { status(error.message); }
   finally { $('#load-more').disabled = false; }
 });
-$('#download-folder').addEventListener('click', () => downloadArchive([challenge], `${challenge === '5' ? 'birds' : 'skeletons'}-photos.zip`));
+$('#download-folder').addEventListener('click', () => {
+  if (challenge === 'all') downloadArchive(['5', '10'], 'halloween-hunt-photos.zip');
+  else downloadArchive([challenge], `${challenge === '5' ? 'birds' : 'skeletons'}-photos.zip`);
+});
 $('#download-all').addEventListener('click', () => downloadArchive(['5', '10'], 'halloween-hunt-photos.zip'));
 $('#start-slideshow').addEventListener('click', () => {
   slideshowWindow = window.open('slideshow.html', 'halloween-slideshow');

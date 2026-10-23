@@ -11,6 +11,7 @@ Each challenge has two URL forms:
 - NFC tags and QR codes use non-sequential token URLs such as `https://YOUR-SITE/?tag=pYX8yQ6OQdhQReHX`. Visiting a valid tag URL unlocks its mapped challenge in the current browser. The 12 tokens are stored in challenge order in `js/config.js`.
 - Normal challenge links use `https://YOUR-SITE/?challenge=01` through `?challenge=12`. These links only open after their matching tag has been found.
 - The organizer shortcut `https://YOUR-SITE/?tag=master` unlocks all 12 challenges in the current browser.
+- The organizer shortcut `https://YOUR-SITE/?tag=supermaster` unlocks all 12 challenges and marks them completed in the current browser.
 
 Unlocks and completed challenges are stored in the browser's `localStorage`.
 

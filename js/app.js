@@ -1,6 +1,11 @@
 'use strict';
 
-import { MASTER_TAG_TOKEN, STORAGE_KEY, TAG_TOKENS } from './config.js';
+import {
+  MASTER_TAG_TOKEN,
+  STORAGE_KEY,
+  SUPERMASTER_TAG_TOKEN,
+  TAG_TOKENS,
+} from './config.js';
 import { CHALLENGES, challengeRenderers } from './challenges.js';
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -98,9 +103,18 @@ function unlock(number) {
 
 function resolveRoute() {
   const scannedToken = new URLSearchParams(location.search).get('tag');
+  const allChallenges = CHALLENGES.map((_, index) => index + 1);
+
+  if (scannedToken === SUPERMASTER_TAG_TOKEN) {
+    state.unlocked = allChallenges;
+    state.solved = allChallenges;
+    save();
+    history.replaceState({}, '', location.pathname);
+    return null;
+  }
 
   if (scannedToken === MASTER_TAG_TOKEN) {
-    state.unlocked = CHALLENGES.map((_, index) => index + 1);
+    state.unlocked = allChallenges;
     save();
     history.replaceState({}, '', location.pathname);
     return null;

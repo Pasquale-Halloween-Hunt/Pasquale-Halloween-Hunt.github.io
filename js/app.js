@@ -409,21 +409,38 @@ function home() {
       }
     };
 
+    const resetFinalAnswer = () => {
+      $('#final-answer').value = '';
+      slots.forEach(slot => { slot.textContent = ''; });
+      $$('.letter-tile').forEach(tile => tile.classList.remove('hidden'));
+    };
+
+    $$('.letter-tile').forEach(tile => tile.addEventListener('click', () => {
+      if (dragMode) return;
+      const slot = slots.find(item => !item.textContent);
+      if (slot) {
+        slot.textContent = tile.textContent;
+        tile.classList.add('hidden');
+      }
+      if (slots.map(item => item.textContent).join('') === 'TRICKORTREAT') showVictory('TRICKORTREAT');
+    }));
+
+    slots.forEach(slot => slot.addEventListener('click', () => {
+      if (dragMode) return;
+      const letter = slot.textContent;
+      slot.textContent = '';
+      const tile = [...$$('.letter-tile')].find(item => item.textContent === letter && item.classList.contains('hidden'));
+      if (tile) {
+        tile.classList.remove('hidden');
+        tile.parentNode.append(tile);
+      }
+    }));
+
     $('#toggle-letter-mode').addEventListener('click', () => {
+      resetFinalAnswer();
       dragMode = !dragMode;
       $('#letter-slots').classList.toggle('hidden', dragMode);
       $('#toggle-letter-mode').textContent = dragMode ? 'Use click mode' : 'Use drag mode';
-      if (!dragMode) $$('.letter-tile').forEach(tile => tile.addEventListener('click', () => {
-        const slot = slots.find(item => !item.textContent);
-        if (slot) { slot.textContent = tile.textContent; tile.classList.add('hidden'); }
-        if (slots.map(item => item.textContent).join('') === 'TRICKORTREAT') showVictory('TRICKORTREAT');
-      }));
-      slots.forEach(slot => slot.addEventListener('click', () => {
-        const letter = slot.textContent;
-        slot.textContent = '';
-        const tile = [...$$('.letter-tile')].find(item => item.textContent === letter && item.classList.contains('hidden'));
-        if (tile) tile.classList.remove('hidden');
-      }));
     });
 
     $$('.letter-tile').forEach(tile => {
